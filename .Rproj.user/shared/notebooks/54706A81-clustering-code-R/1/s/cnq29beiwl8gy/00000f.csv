@@ -1,0 +1,2 @@
+"0","data <- data |> "
+"0","  mutate(Padre_de_Familia = ifelse(Cantidad_hijos > 0, 1, 0))"

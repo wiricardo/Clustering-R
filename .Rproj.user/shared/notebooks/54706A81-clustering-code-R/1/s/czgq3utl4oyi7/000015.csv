@@ -1,0 +1,5 @@
+"0","data <- data |> "
+"0","  mutate(Tamaño_Familia = case_when("
+"0","    estado_civil == ""Soltero"" ~ 1 + Cantidad_hijos,"
+"0","    estado_civil == ""Casado"" ~ 2 + Cantidad_hijos"
+"0","  ))"

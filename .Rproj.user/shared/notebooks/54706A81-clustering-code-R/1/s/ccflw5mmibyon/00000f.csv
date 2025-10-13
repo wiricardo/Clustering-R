@@ -1,3 +1,3 @@
 "0","data <- data |>"
-"0","        mutate(Income = replace(Income, is.na(Income), mean(Income, na.rm = TRUE)))"
+"0","        mutate(Ingreso = replace(Ingreso, is.na(Ingreso), mean(Ingreso, na.rm = TRUE)))"
 "0",""

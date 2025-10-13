@@ -1,0 +1,7 @@
+"0","data <- data |> "
+"0","  mutate(Educacion = case_when("
+"0","    Education %in% c(""Basic"", ""2n Cycle"") ~ ""básica"","
+"0","    Education == ""Graduation"" ~ ""Pre_grado"","
+"0","    Education %in% c(""Master"", ""PhD"") ~ ""Pos_grado"","
+"0","    TRUE ~ Education"
+"0","  ))"

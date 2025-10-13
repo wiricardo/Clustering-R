@@ -1,5 +1,4 @@
-"0","data$Dt_Customer |> table()
-"
+"0","data$Dt_Customer |> table()"
 "1","
 "
 "1","01-01-2013 "
