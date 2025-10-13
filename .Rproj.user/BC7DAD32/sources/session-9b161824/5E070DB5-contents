@@ -2,4 +2,14 @@
 title: "clustering-code-R"
 ---
 
+# Libraries
+
+```{r}
+library(tidymodels)
+library(tidyverse)
+library(tidyclust)
+
+
+
+```
 
