@@ -22,6 +22,33 @@ data <- import("marketing_campaign.csv")
 ```{r}
 str(data)
 ```
+Exploramos las variables categoricas:
+```{r}
+data$Education |> n_distinct()
+data$Marital_Status |>  n_distinct()
+data$Dt_Customer |> n_distinct()
+
+```
+```{r}
+data$Education |> table()
+```
+
+```{r}
+data$Marital_Status |> table()
+```
+
+```{r}
+data$Dt_Customer |> table()
+```
+
+
+Quitamos la varible fecha para evitar conflictos
+
+```{r}
+data <- data$Fecha <- NULL
+```
+
+
 
 ## Buscamos valores faltantes y duplicados
 
@@ -48,8 +75,8 @@ na_dup <- function(data) {
 na_dup(data)
 ```
 
-- Se identificó que la columna **Income** tiene valores faltantes, por lo cual se procesera a la imputacion de los datos
-- No se identificaron valores duplicados
+-   No se identificaron valores duplicados
+-   Se identificó que la columna **Income** tiene valores faltantes, por lo cual se procesera a la imputacion de los datos
 
 ```{r}
 data <- data |>
@@ -58,9 +85,36 @@ data <- data |>
 ```
 
 Verificamos que no haya datos faltantes
+
 ```{r}
 na_dup(data)
 ```
+- Los valores faltantes fueron imputados correctamente
+
+## convertimos a factores
+
+```{r}
+char_a_factores <- function(data) {
+  data <- data |> 
+    mutate(across(where(is.character), as.factor))
+  return(data)
+}
+
+data <- char_a_factores(data)
+str(data)
+
+```
+
+
+## Estandarizacion de datos
+
+```{r}
+data <- scale(data)
+data
+```
+
+
+
 
 
 
