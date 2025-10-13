@@ -8,8 +8,16 @@ title: "clustering-code-R"
 library(tidymodels)
 library(tidyverse)
 library(tidyclust)
-
+library(rio)
 
 
 ```
+
+# Importacion y limpieza de la data
+
+```{r}
+data <- import("marketing_campaign.csv")
+```
+
+
 
