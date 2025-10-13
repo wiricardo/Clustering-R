@@ -1,6 +1,0 @@
-"0","data <- data |> "
-"0","  mutate(estado_civil = case_when("
-"0","    Marital_Status %in% c(""Married"", ""Together"") ~ ""Casado"","
-"0","    Marital_Status %in% c(""Absurd"", ""Widow"", ""YOLO"", ""Divorced"", ""Single"") ~ ""Soltero"","
-"0","    TRUE ~ Marital_Status"
-"0","  ))"

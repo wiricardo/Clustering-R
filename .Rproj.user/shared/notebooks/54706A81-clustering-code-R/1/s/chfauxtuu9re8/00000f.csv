@@ -1,2 +1,0 @@
-"0","data <- data |> "
-"0","  select(-c(Marital_Status, Dt_Customer, Z_CostContact, Z_Revenue, Year_Birth, ID, Education))"

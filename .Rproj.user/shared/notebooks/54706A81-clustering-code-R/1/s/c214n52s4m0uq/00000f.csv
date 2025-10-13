@@ -1,2 +1,0 @@
-"0","data <- data |> "
-"0","  mutate(Age = 2021 - Year_Birth)"

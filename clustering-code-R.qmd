@@ -9,7 +9,7 @@ library(tidymodels)
 library(tidyverse)
 library(tidyclust)
 library(rio)
-
+library(GGally)
 
 ```
 
@@ -22,13 +22,16 @@ data <- import("marketing_campaign.csv")
 ```{r}
 str(data)
 ```
+
 Exploramos las variables categoricas:
+
 ```{r}
 data$Education |> n_distinct()
 data$Marital_Status |>  n_distinct()
 data$Dt_Customer |> n_distinct()
 
 ```
+
 ```{r}
 data$Education |> table()
 ```
@@ -41,19 +44,24 @@ data$Marital_Status |> table()
 data$Dt_Customer |> table()
 ```
 
-Transformamos las variables 
+Transformamos las variables
 
-- Calculamos la edad 
+-   Calculamos la edad
+
 ```{r}
 data <- data |> 
-  mutate(Age = 2021 - Year_Birth)
+  mutate(Edad = 2021 - Year_Birth)
 ```
-- Gasto total
+
+-   Gasto total
+
 ```{r}
 data <- data |> 
   mutate(Gasto_total = MntWines + MntFruits + MntMeatProducts + MntFishProducts + MntSweetProducts + MntGoldProds)
 ```
-- Estado civil
+
+-   Estado civil
+
 ```{r}
 data <- data |> 
   mutate(estado_civil = case_when(
@@ -62,12 +70,16 @@ data <- data |>
     TRUE ~ Marital_Status
   ))
 ```
-- Cantidad de hijos
+
+-   Cantidad de hijos
+
 ```{r}
 data <- data |> 
   mutate(Cantidad_hijos = Kidhome + Teenhome)
 ```
-- Tamaño de la familia
+
+-   Tamaño de la familia
+
 ```{r}
 data <- data |> 
   mutate(Tamaño_Familia = case_when(
@@ -75,12 +87,16 @@ data <- data |>
     estado_civil == "Casado" ~ 2 + Cantidad_hijos
   ))
 ```
-- Padre de familia
+
+-   Padre de familia
+
 ```{r}
 data <- data |> 
   mutate(Padre_de_Familia = ifelse(Cantidad_hijos > 0, 1, 0))
 ```
-- Educacion
+
+-   Educacion
+
 ```{r}
 data <- data |> 
   mutate(Educacion = case_when(
@@ -90,7 +106,9 @@ data <- data |>
     TRUE ~ Education
   ))
 ```
-- Cambio de nombre a columnas de interes
+
+-   Cambio de nombre a columnas de interes
+
 ```{r}
 data <- data |> 
   rename(
@@ -125,19 +143,17 @@ data <- data |>
     
   )
 ```
-- Variables descartadas
+
+-   Variables descartadas
+
 ```{r}
 data <- data |> 
   select(-c(Marital_Status, Dt_Customer, Z_CostContact, Z_Revenue, Year_Birth, ID, Education))
 ```
 
-
-
 ```{r}
 data
 ```
-
-
 
 ## Buscamos valores faltantes y duplicados
 
@@ -178,7 +194,8 @@ Verificamos que no haya datos faltantes
 ```{r}
 na_dup(data)
 ```
-- Los valores faltantes fueron imputados correctamente
+
+-   Los valores faltantes fueron imputados correctamente
 
 ## convertimos a factores
 
@@ -195,15 +212,86 @@ str(data)
 ```
 
 
+
+## deteccion de posibles outliers en la data
+
+-   Variables con posibles ouliers
+
+    - Ingreso
+    - Edad
+    - gasto_vinos
+    - gasto_frutas
+    - gasto_carne
+    - gasto_pescado
+    - gasto_dulces
+    - gasto_gold
+    - gasto_total
+
+    ```{r}
+detectar_outliers <- function(x) {
+  Q1 <- quantile(x, 0.25, na.rm = TRUE)
+  Q3 <- quantile(x, 0.75, na.rm = TRUE)
+  IQR <- Q3 - Q1
+  
+  limite_inferior <- Q1 - 1.5 * IQR
+  limite_superior <- Q3 + 1.5 * IQR
+  
+  outliers <- x < limite_inferior | x > limite_superior
+  
+  return(list(
+    outliers = which(outliers),
+    cantidad = sum(outliers),
+    limites = c(inferior = limite_inferior, superior = limite_superior)
+  ))
+}
+    ```
+
+
+```{r}
+detectar_outliers <- function(x, nombre_var = "Variable") {
+  Q1 <- quantile(x, 0.25, na.rm = TRUE)
+  Q3 <- quantile(x, 0.75, na.rm = TRUE)
+  IQR <- Q3 - Q1
+  
+  limite_inferior <- Q1 - 1.5 * IQR
+  limite_superior <- Q3 + 1.5 * IQR
+  
+  outliers <- x < limite_inferior | x > limite_superior
+  
+  # Crear gráficos
+  par(mfrow = c(1, 2))
+  
+  # Boxplot
+  boxplot(x, main = paste("Boxplot:", nombre_var), 
+          ylab = "Valor", col = "steelblue")
+  
+  # QQplot
+  qqnorm(x, main = paste("QQplot:", nombre_var))
+  qqline(x, col = "red", lwd = 2)
+  
+  par(mfrow = c(1, 1))
+  
+  return(list(
+    outliers = which(outliers),
+    cantidad = sum(outliers),
+    limites = c(inferior = limite_inferior, superior = limite_superior)
+  ))
+}
+```
+
+
+
+```{r}
+detectar_outliers(data$Edad)
+```
+```{r}
+data$Edad |> table()
+```
+
+
 ## Estandarizacion de datos
 
 ```{r}
 data <- scale(data)
 data
 ```
-
-
-
-
-
-
