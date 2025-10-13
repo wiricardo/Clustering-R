@@ -13,7 +13,7 @@ library(rio)
 
 ```
 
-# Importacion y limpieza de la data
+# Importacion y tratamiento de la data
 
 ```{r}
 data <- import("marketing_campaign.csv")
@@ -47,4 +47,20 @@ na_dup <- function(data) {
 
 na_dup(data)
 ```
+
+- Se identificó que la columna **Income** tiene valores faltantes, por lo cual se procesera a la imputacion de los datos
+- No se identificaron valores duplicados
+
+```{r}
+data <- data |>
+        mutate(Income = replace(Income, is.na(Income), mean(Income, na.rm = TRUE)))
+
+```
+
+Verificamos que no haya datos faltantes
+```{r}
+na_dup(data)
+```
+
+
 

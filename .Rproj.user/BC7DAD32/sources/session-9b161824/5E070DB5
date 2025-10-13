@@ -3,7 +3,7 @@
     "path": "~/R_intermedio_quarto/Task_2_clustering/clustering-code-R/clustering-code-R.qmd",
     "project_path": "clustering-code-R.qmd",
     "type": "quarto_markdown",
-    "hash": "3307400338",
+    "hash": "3230164717",
     "contents": "",
     "dirty": false,
     "created": 1760361926397.0,
@@ -17,15 +17,15 @@
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
         "rmdVisualModeLocation": "2:0",
-        "cursorPosition": "39,33",
-        "scrollLine": "26"
+        "cursorPosition": "51,40",
+        "scrollLine": "49"
     },
     "folds": "",
-    "lastKnownWriteTime": 1760370404,
+    "lastKnownWriteTime": 1760371246,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1760370404747,
+    "last_content_update": 1760371246192,
     "read_only": false,
     "read_only_alternatives": []
 }
