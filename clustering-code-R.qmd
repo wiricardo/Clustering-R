@@ -214,79 +214,142 @@ str(data)
 
 
 ## deteccion de posibles outliers en la data
+```{r}
+detectar_outliers <- function(x, nombre_var = "") {
+  Q1 <- quantile(x, 0.25, na.rm = TRUE)
+  Q3 <- quantile(x, 0.75, na.rm = TRUE)
+  IQR <- Q3 - Q1
+  
+  limite_inferior <- Q1 - 1.5 * IQR
+  limite_superior <- Q3 + 1.5 * IQR
+  
+  outliers <- x < limite_inferior | x > limite_superior
+  
+  boxplot(x, main = paste("Boxplot de", nombre_var), 
+          ylab = "Valor", col = "orange") 
+
+  return(list(
+    outliers = which(outliers),
+    cantidad = sum(outliers),
+    limites = c(inferior = limite_inferior, superior = limite_superior)
+  ))
+}
+```
 
 -   Variables con posibles ouliers
 
     - Ingreso
+    
+```{r}
+detectar_outliers(data$Ingreso, "Ingreso")
+```
+    
+    
     - Edad
+    
+```{r}
+detectar_outliers(data$Edad, "Edad")
+```
+    
+    
     - gasto_vinos
+    
+```{r}
+detectar_outliers(data$gasto_vinos, "Gasto en Vinos")
+```
+    
+    
     - gasto_frutas
+    
+```{r}
+detectar_outliers(data$gasto_frutas, "Gasto en Frutas")
+```
+    
+  
     - gasto_carne
+    
+```{r}
+detectar_outliers(data$gasto_carne, "Gasto en Carne")
+```
+    
+    
     - gasto_pescado
+    
+```{r}
+detectar_outliers(data$gasto_pescado, "Gasto en Pescado")
+```
+    
+    
     - gasto_dulces
+    
+```{r}
+detectar_outliers(data$gasto_dulces, "Gasto en Dulces")
+```
+    
+    
     - gasto_gold
+    
+```{r}
+detectar_outliers(data$gasto_gold, "Gasto en Gold")
+```
+    
+    
     - gasto_total
-
-    ```{r}
-detectar_outliers <- function(x) {
-  Q1 <- quantile(x, 0.25, na.rm = TRUE)
-  Q3 <- quantile(x, 0.75, na.rm = TRUE)
-  IQR <- Q3 - Q1
-  
-  limite_inferior <- Q1 - 1.5 * IQR
-  limite_superior <- Q3 + 1.5 * IQR
-  
-  outliers <- x < limite_inferior | x > limite_superior
-  
-  return(list(
-    outliers = which(outliers),
-    cantidad = sum(outliers),
-    limites = c(inferior = limite_inferior, superior = limite_superior)
-  ))
-}
-    ```
-
-
+    
 ```{r}
-detectar_outliers <- function(x, nombre_var = "Variable") {
-  Q1 <- quantile(x, 0.25, na.rm = TRUE)
-  Q3 <- quantile(x, 0.75, na.rm = TRUE)
-  IQR <- Q3 - Q1
-  
-  limite_inferior <- Q1 - 1.5 * IQR
-  limite_superior <- Q3 + 1.5 * IQR
-  
-  outliers <- x < limite_inferior | x > limite_superior
-  
-  # Crear gráficos
-  par(mfrow = c(1, 2))
-  
-  # Boxplot
-  boxplot(x, main = paste("Boxplot:", nombre_var), 
-          ylab = "Valor", col = "steelblue")
-  
-  # QQplot
-  qqnorm(x, main = paste("QQplot:", nombre_var))
-  qqline(x, col = "red", lwd = 2)
-  
-  par(mfrow = c(1, 1))
-  
-  return(list(
-    outliers = which(outliers),
-    cantidad = sum(outliers),
-    limites = c(inferior = limite_inferior, superior = limite_superior)
-  ))
-}
+detectar_outliers(data$Gasto_total, "Gasto Total")
 ```
+    
+    - Dias_ultima_compra 
+```{r}
+detectar_outliers(data$Dias_ultima_compra, "Dias desde la última compra")
+```
+    
+    
+    - cantidad_compra_con_descuento
+    
+```{r}
+detectar_outliers(data$cantidad_compra_con_descuento, "Cantidad de compra con descuento")
+```
+    
+    
+    - cantidad_compra_web   
+    
+```{r}
+detectar_outliers(data$cantidad_compra_web, "Cantidad compra web")
+```
+    
+    
+    - cantidad_compra_catalogo
+    
+```{r}
+detectar_outliers(data$cantidad_compra_catalogo, "Cantidad compra catalogo")
+```
+    
+    
+    - cantidad_compra_tienda 
+    
+```{r}
+detectar_outliers(data$cantidad_compra_tienda, "Cantidad compra en tienda")
+```
+    
+    - cantidad_visitas_web_mes 
+    
+```{r}
+detectar_outliers(data$cantidad_visitas_web_mes, "Cantidad de visitas web al mes")
+```
+    
+
+
+
+
 
 
 
 ```{r}
-detectar_outliers(data$Edad)
+
 ```
-```{r}
-data$Edad |> table()
-```
+
 
 
 ## Estandarizacion de datos
