@@ -19,5 +19,32 @@ library(rio)
 data <- import("marketing_campaign.csv")
 ```
 
+```{r}
+str(data)
+```
 
+## Buscamos valores faltantes y duplicados
+
+```{r}
+na_dup <- function(data) {
+  missing_values <- colSums(is.na(data))
+  missing_values_perc <- missing_values / nrow(data) * 100
+  duplicated_values <- sum(duplicated(data))
+  duplicated_values_perc <- duplicated_values / nrow(data) * 100
+  data_types <- sapply(data, class)
+  
+  resumen <- data.frame(
+    Valores_Faltantes  = missing_values,
+    Valores_Faltantes_Porcentaje = missing_values_perc,
+    Valores_Duplicados = duplicated_values,
+    Valores_Duplicados_Porcentaje = duplicated_values_perc,
+    Tipo_de_Variable = data_types,
+    stringsAsFactors = FALSE
+  )
+  
+  return(resumen)
+}
+
+na_dup(data)
+```
 
