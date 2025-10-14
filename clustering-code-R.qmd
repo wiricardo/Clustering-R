@@ -445,40 +445,144 @@ distancias= daisy(data,
 
 # Determinamos el número de clusters
 
+## Método del codo (elbow method)
 
-## Método del codo (elbow method) 
 ```{r}
 fviz_nbclust(data, 
-             hcut,                   # Método de clusterización elegido  
-             diss=distancias,        # Distancias
-             method = "wss",         # Método
-             k.max = 10,             # Probó con 10 cluster
+             hcut,                    
+             diss=distancias,        
+             method = "wss",         
+             k.max = 10,            
              verbose = F)
 ```
 
-- Escogemos 3 clusters
-
+-   Escogemos **3 clusters**
 
 ## Método NbClust
 
 ```{r}
 set.seed(2025)
-res.nbclust <- NbClust(data,           # Data
-                       distance = "euclidean",  # Distancia utilizada
-                       min.nc = 2,              # Mínimo
-                       max.nc = 5,              # Máximo
-                       method = "average",      # Método
-                       index ="all")            # Índices considerados
+res.nbclust <- NbClust(data,           
+                       distance = "euclidean",  
+                       min.nc = 2,              
+                       max.nc = 5,              
+                       method = "average",      
+                       index ="all")          
 ```
-- Confirmamos que tenemos que usar 3 clusters
 
+-   Confirmamos que tenemos que usar **3 clusters**
 
+# Calculamos el cluster
 
+## Jerarquico Aglomerativo
 
+```{r}
+aglomerativo = hcut(x = distancias,       
+                    k = 3,               
+                    hc_func='agnes',      
+                    hc_method = "ward.D") 
+```
 
+### Dendograma de Cluster Jerarquico Aglomerativo
 
+```{r}
+fviz_dend(aglomerativo, 
+          rect = TRUE,  
+          cex = 0.5)    
+```
 
+```{r}
+data2<-data %>% 
+  mutate(aglomerativo=aglomerativo$cluster) 
 
+data2 %>% 
+  group_by(aglomerativo) %>% 
+  summarise(Gasto_total = mean(Gasto_total),
+            Edad = mean(Edad), 
+            Cantidad_compra_total = mean(Cantidad_compra_total))
+```
 
+Podemos ver que:
 
+-   Cluster 1: Presenta, en promedio, los mayores niveles de gasto total (\$1,355.83), la mayor cantidad de compras (23.01) y una edad moderada (51.81 años). Son clientes de alto valor con comportamiento de compra muy activo.
 
+-   Cluster 2: Presenta, en promedio, los menores niveles de gasto total (\$89.71), la menor cantidad de compras (7.54) y una edad similar a los otros grupos (48.93 años). Son clientes de bajo valor con comportamiento de compra muy limitado.
+
+-   Cluster 3: Presenta, en promedio, niveles intermedios de gasto total (\$626.83) y cantidad de compras (17.94), pero destaca por tener la mayor edad promedio (57.71 años). Son clientes de valor moderado con comportamiento de compra regular y perfil más maduro.
+
+```{r}
+fviz_cluster(object = list(data=data2[,1:3], 
+                           cluster = data2$aglomerativo),
+             geom = c("text"), 
+             ellipse.type = "convex")
+```
+
+### Validacion del cluster
+
+```{r}
+plot_con <- fviz_silhouette(aglomerativo, label=TRUE)
+plot_con
+```
+
+El ancho promedio de silueta de 0.35 indica una calidad de clustering moderada y aceptable. El Cluster 2 (verde) es el más compacto y bien definido con excelente cohesión, mientras que el Cluster 1 (rojo) presenta baja cohesión con elementos mal clasificados y el Cluster 3 (azul) muestra cohesión moderada con cierta dispersión. En general, el clustering es satisfactorio, aunque los Clusters 1 y 3 presentan debilidades que podrían mejorarse.
+
+## Divisivo
+
+```{r}
+divisivo = hcut(distancias, 
+                k = 3,           
+                hc_func='diana')
+```
+
+### Dendograma de Divisivo
+
+```{r}
+fviz_dend(divisivo, 
+          rect = TRUE, 
+          cex = 0.5)
+```
+
+```{r}
+data3<-data %>% 
+  mutate(divisivo=divisivo$cluster) 
+
+data3 %>% 
+  group_by(divisivo) %>% 
+  summarise(Gasto_total = mean(Gasto_total),
+            Edad = mean(Edad), 
+            Cantidad_compra_total = mean(Cantidad_compra_total))
+```
+
+Podemos ver que:
+
+-   Cluster 1 (Divisivo): Presenta, en promedio, altos niveles de gasto total (\$1,094.53), la mayor edad promedio (64.45 años) y alto número de compras (21.60). Son clientes de valor alto con perfil maduro.
+
+-   Cluster 2 (Divisivo): Presenta, en promedio, los menores niveles de gasto total (\$146.84), la menor edad promedio (50.18 años) y el menor número de compras (9.19). Son clientes de bajo valor con comportamiento ocasional.
+
+-   Cluster 3 (Divisivo): Presenta, en promedio, el mayor gasto total (\$1,238.08), la menor edad promedio (44.34 años) y el mayor número de compras (22.03). Son clientes de valor muy alto, más jóvenes y con comportamiento de compra muy activo.
+
+```{r}
+fviz_cluster(object = list(data=data3[,1:3], 
+                           cluster = data3$divisivo),
+             geom = c("text"), 
+             ellipse.type = "convex")
+```
+
+### Validacion de Cluster
+
+```{r}
+
+plot_div <- fviz_silhouette(divisivo, label=TRUE)
+plot_div
+```
+
+El ancho promedio de silueta de 0.42 indica una calidad de clustering buena. El Cluster 2 (verde) mantiene su excelente cohesión con valores de silueta altos, el Cluster 1 (rojo) muestra mejor definición con valores cercanos al promedio, y el Cluster 3 (azul) presenta cohesión moderada. Sin embargo, el Cluster 2 presenta algunos puntos con valores negativos de silueta, indicando elementos mal clasificados o fronterizos que podrían pertenecer mejor a otros clusters.
+
+# Conclusiones
+
+```{r}
+plot_con
+plot_div
+```
+
+El modelo divisivo con ancho de silueta 0.42 tiene mejor desempeño que el modelo jerárquico aglomerativo con 0.35. El clustering divisivo logra una calidad superior con mayor separación entre clusters y menos elementos mal clasificados. Este modelo identifica tres segmentos de clientes claramente diferenciados: el Cluster 3 representa el segmento más valioso con mayor gasto y frecuencia de compra, el Cluster 1 agrupa clientes maduros de alto valor, y el Cluster 2 clientes ocasionales de bajo valor. Esta segmentación permite implementar estrategias de marketing personalizadas: retención y premium para Clusters 1 y 3, y activación para Cluster 2.
