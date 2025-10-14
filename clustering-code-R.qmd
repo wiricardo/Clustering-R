@@ -10,7 +10,10 @@ library(tidyverse)
 library(tidyclust)
 library(rio)
 library(GGally)
-
+library(plotly)
+library(cluster)
+library(factoextra)
+library(NbClust)
 ```
 
 # Importacion y tratamiento de la data
@@ -211,9 +214,8 @@ str(data)
 
 ```
 
-
-
 ## deteccion de posibles outliers en la data
+
 ```{r}
 detectar_outliers <- function(x, nombre_var = "") {
   Q1 <- quantile(x, 0.25, na.rm = TRUE)
@@ -238,123 +240,245 @@ detectar_outliers <- function(x, nombre_var = "") {
 
 -   Variables con posibles ouliers
 
-    - Ingreso
-    
+    -   Ingreso
+
 ```{r}
 detectar_outliers(data$Ingreso, "Ingreso")
 ```
-    
-    
-    - Edad
-    
+
+```         
+- Edad
+```
+
 ```{r}
 detectar_outliers(data$Edad, "Edad")
 ```
-    
-    
-    - gasto_vinos
-    
+
+```         
+- gasto_vinos
+```
+
 ```{r}
 detectar_outliers(data$gasto_vinos, "Gasto en Vinos")
 ```
-    
-    
-    - gasto_frutas
-    
+
+```         
+- gasto_frutas
+```
+
 ```{r}
 detectar_outliers(data$gasto_frutas, "Gasto en Frutas")
 ```
-    
-  
-    - gasto_carne
-    
+
+```         
+- gasto_carne
+```
+
 ```{r}
 detectar_outliers(data$gasto_carne, "Gasto en Carne")
 ```
-    
-    
-    - gasto_pescado
-    
+
+```         
+- gasto_pescado
+```
+
 ```{r}
 detectar_outliers(data$gasto_pescado, "Gasto en Pescado")
 ```
-    
-    
-    - gasto_dulces
-    
+
+```         
+- gasto_dulces
+```
+
 ```{r}
 detectar_outliers(data$gasto_dulces, "Gasto en Dulces")
 ```
-    
-    
-    - gasto_gold
-    
+
+```         
+- gasto_gold
+```
+
 ```{r}
 detectar_outliers(data$gasto_gold, "Gasto en Gold")
 ```
-    
-    
-    - gasto_total
-    
+
+```         
+- gasto_total
+```
+
 ```{r}
 detectar_outliers(data$Gasto_total, "Gasto Total")
 ```
-    
-    - Dias_ultima_compra 
+
+```         
+- Dias_ultima_compra 
+```
+
 ```{r}
 detectar_outliers(data$Dias_ultima_compra, "Dias desde la última compra")
 ```
-    
-    
-    - cantidad_compra_con_descuento
-    
+
+```         
+- cantidad_compra_con_descuento
+```
+
 ```{r}
 detectar_outliers(data$cantidad_compra_con_descuento, "Cantidad de compra con descuento")
 ```
-    
-    
-    - cantidad_compra_web   
-    
+
+```         
+- cantidad_compra_web   
+```
+
 ```{r}
 detectar_outliers(data$cantidad_compra_web, "Cantidad compra web")
 ```
-    
-    
-    - cantidad_compra_catalogo
-    
+
+```         
+- cantidad_compra_catalogo
+```
+
 ```{r}
 detectar_outliers(data$cantidad_compra_catalogo, "Cantidad compra catalogo")
 ```
-    
-    
-    - cantidad_compra_tienda 
-    
+
+```         
+- cantidad_compra_tienda 
+```
+
 ```{r}
 detectar_outliers(data$cantidad_compra_tienda, "Cantidad compra en tienda")
 ```
-    
-    - cantidad_visitas_web_mes 
-    
+
+```         
+- cantidad_visitas_web_mes 
+```
+
 ```{r}
 detectar_outliers(data$cantidad_visitas_web_mes, "Cantidad de visitas web al mes")
 ```
+
+```{r}
+
+```
+
+## Datos seleccionados
+
+Luego de revisar los datos, para los objetivos de la practica se seleccionaron las siguientes variables
+
+-   Gasto total
+-   Cantidad Compra total (suma de las variables cantidad compra)
+-   Edad
+
+```{r}
+data <- data |> 
+  mutate(Cantidad_compra_total = cantidad_compra_con_descuento + 
+                                 cantidad_compra_web + 
+                                 cantidad_compra_catalogo + 
+                                 cantidad_compra_tienda) |>
+  select(Gasto_total, Edad, Cantidad_compra_total)
+```
+
+## Eliminamos outliers
+
+```{r}
+eliminar_outliers <- function(data) {
+  for (col in colnames(data)) {
+    Q1 <- quantile(data[[col]], 0.25, na.rm = TRUE)
+    Q3 <- quantile(data[[col]], 0.75, na.rm = TRUE)
+    IQR <- Q3 - Q1
     
+    data <- data |> 
+      filter(data[[col]] >= Q1 - 1.5 * IQR & data[[col]] <= Q3 + 1.5 * IQR)
+  }
+  return(data)
+}
 
 
-
-
-
-
-
-```{r}
-
+data <- eliminar_outliers(data)
 ```
 
-
-
-## Estandarizacion de datos
+### Comprovamos si quedan outliers
 
 ```{r}
-data <- scale(data)
-data
+detectar_outliers(data$Gasto_total, "Gasto total")
+detectar_outliers(data$Edad, "Edad")
+detectar_outliers(data$Cantidad_compra_total, "Cantida Compra Total")
 ```
+
+# Análisis exploratorio de datos
+
+```{r}
+data |>  
+  ggplot(aes(x= Gasto_total, y=Cantidad_compra_total)) + 
+  geom_point() 
+```
+
+```{r}
+data |>  
+  ggplot(aes(x= Gasto_total, y=Edad)) + 
+  geom_point() 
+```
+
+```{r}
+plot_ly(x = data$Gasto_total,
+        y = data$Cantidad_compra_total,
+        z = data$Edad,
+        text = rownames(data),
+        type = "scatter3d",
+        mode = "markers") |> 
+  layout(
+    scene = list(
+      xaxis = list(title = "Gasto total"),
+      yaxis = list(title = "Cantidad de Compra Total"),
+      zaxis = list(title = "Edad")
+    )
+  )
+```
+
+# Calculamos las distancias
+
+```{r}
+distancias= daisy(data, 
+                  metric="gower")
+```
+
+# Determinamos el número de clusters
+
+
+## Método del codo (elbow method) 
+```{r}
+fviz_nbclust(data, 
+             hcut,                   # Método de clusterización elegido  
+             diss=distancias,        # Distancias
+             method = "wss",         # Método
+             k.max = 10,             # Probó con 10 cluster
+             verbose = F)
+```
+
+- Escogemos 3 clusters
+
+
+## Método NbClust
+
+```{r}
+set.seed(2025)
+res.nbclust <- NbClust(data,           # Data
+                       distance = "euclidean",  # Distancia utilizada
+                       min.nc = 2,              # Mínimo
+                       max.nc = 5,              # Máximo
+                       method = "average",      # Método
+                       index ="all")            # Índices considerados
+```
+- Confirmamos que tenemos que usar 3 clusters
+
+
+
+
+
+
+
+
+
+
+
