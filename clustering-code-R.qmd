@@ -175,7 +175,7 @@ data <- data |>
 ```
 
 ```{r}
-data
+head(data)
 ```
 
 ## Buscamos valores faltantes y duplicados
