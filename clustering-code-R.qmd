@@ -5,6 +5,7 @@ title: "clustering-code-R"
 # Libraries
 
 ```{r}
+#| warning: false
 library(tidymodels)
 library(tidyverse)
 library(tidyclust)
@@ -15,6 +16,25 @@ library(cluster)
 library(factoextra)
 library(NbClust)
 ```
+
+
+# Base de Datos: Customer Personality Analysis
+
+## Contenido
+Base de datos de **perfiles de clientes** con información demográfica, histórico de compras, interacciones con campañas de marketing y patrones de comportamiento.
+
+## Variables originales
+- Datos demográficos (edad, educación, ingresos, estado civil)
+- Gasto por categoría de producto (vinos, frutas, carnes, pescado, dulces, oro)
+- Canales de compra (web, catálogo, tienda física)
+- Respuesta a campañas de marketing
+- Recencia de compras e interacciones
+
+## Variables seleccionadas para la práctica
+- **Gasto total:** Suma de todas las categorías de productos
+- **Cantidad de compra total:** Suma de todas las transacciones
+- **Edad:** Derivada del año de nacimiento
+
 
 # Importacion y tratamiento de la data
 
